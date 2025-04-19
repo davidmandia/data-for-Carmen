@@ -78,28 +78,166 @@ summary.to_csv('data/summary_by_county_2018_vs_2024.csv', index=False)
 #print(summary['County'].unique())
 
 
-replace_map = {
-    'Bristol, City of': 'County of Bristol',
-    'County Durham': 'Durham',
-    'Herefordshire, County of': 'Herefordshire',
+# Mapping of local authorities to counties (only for England)
+local_authority_to_county = {
+    'County Durham': 'County Durham',
+    'Darlington': 'County Durham',
+    'Hartlepool': 'County Durham',
+    'Middlesbrough': 'North Yorkshire',
+    'Northumberland': 'Northumberland',
+    'Redcar and Cleveland': 'North Yorkshire',
+    'Stockton-on-Tees': 'North Yorkshire',
+    'Gateshead': 'Tyne and Wear',
+    'Newcastle upon Tyne': 'Tyne and Wear',
+    'North Tyneside': 'Tyne and Wear',
+    'South Tyneside': 'Tyne and Wear',
+    'Sunderland': 'Tyne and Wear',
+    'Blackburn with Darwen': 'Lancashire',
+    'Blackpool': 'Lancashire',
     'Cheshire East': 'Cheshire',
     'Cheshire West and Chester': 'Cheshire',
+    'Cumberland': 'Cumbria',
+    'Halton': 'Cheshire',
+    'Warrington': 'Cheshire',
+    'Westmorland and Furness': 'Cumbria',
+    'Bolton': 'Greater Manchester',
+    'Bury': 'Greater Manchester',
+    'Manchester': 'Greater Manchester',
+    'Oldham': 'Greater Manchester',
+    'Rochdale': 'Greater Manchester',
+    'Salford': 'Greater Manchester',
+    'Stockport': 'Greater Manchester',
+    'Tameside': 'Greater Manchester',
+    'Trafford': 'Greater Manchester',
+    'Wigan': 'Greater Manchester',
+    'Burnley': 'Lancashire',
+    'Chorley': 'Lancashire',
+    'Fylde': 'Lancashire',
+    'Hyndburn': 'Lancashire',
+    'Lancaster': 'Lancashire',
+    'Pendle': 'Lancashire',
+    'Preston': 'Lancashire',
+    'Ribble Valley': 'Lancashire',
+    'Rossendale': 'Lancashire',
+    'South Ribble': 'Lancashire',
+    'West Lancashire': 'Lancashire',
+    'Wyre': 'Lancashire',
+    'Knowsley': 'Merseyside',
+    'Liverpool': 'Merseyside',
+    'Sefton': 'Merseyside',
+    'St. Helens': 'Merseyside',
+    'Wirral': 'Merseyside',
+    'East Riding of Yorkshire': 'East Riding of Yorkshire',
+    'Kingston upon Hull, City of': 'East Riding of Yorkshire',
+    'North East Lincolnshire': 'Lincolnshire',
+    'North Lincolnshire': 'Lincolnshire',
+    'North Yorkshire': 'North Yorkshire',
+    'York': 'North Yorkshire',
+    'Barnsley': 'South Yorkshire',
+    'Doncaster': 'South Yorkshire',
+    'Rotherham': 'South Yorkshire',
+    'Sheffield': 'South Yorkshire',
+    'Bradford': 'West Yorkshire',
+    'Calderdale': 'West Yorkshire',
+    'Kirklees': 'West Yorkshire',
+    'Leeds': 'West Yorkshire',
+    'Wakefield': 'West Yorkshire',
+    'Derby': 'Derbyshire',
+    'Leicester': 'Leicestershire',
+    'North Northamptonshire': 'Northamptonshire',
+    'Nottingham': 'Nottinghamshire',
+    'Rutland': 'Rutland',
+    'West Northamptonshire': 'Northamptonshire',
+    'Amber Valley': 'Derbyshire',
+    'Bolsover': 'Derbyshire',
+    'Chesterfield': 'Derbyshire',
+    'Derbyshire Dales': 'Derbyshire',
+    'Erewash': 'Derbyshire',
+    'High Peak': 'Derbyshire',
+    'North East Derbyshire': 'Derbyshire',
+    'South Derbyshire': 'Derbyshire',
+    'Blaby': 'Leicestershire',
+    'Charnwood': 'Leicestershire',
+    'Harborough': 'Leicestershire',
+    'Hinckley and Bosworth': 'Leicestershire',
+    'Melton': 'Leicestershire',
+    'North West Leicestershire': 'Leicestershire',
+    'Oadby and Wigston': 'Leicestershire',
+    'Boston': 'Lincolnshire',
+    'East Lindsey': 'Lincolnshire',
+    'Lincoln': 'Lincolnshire',
+    'North Kesteven': 'Lincolnshire',
+    'South Holland': 'Lincolnshire',
+    'South Kesteven': 'Lincolnshire',
+    'West Lindsey': 'Lincolnshire',
+    'Ashfield': 'Nottinghamshire',
+    'Bassetlaw': 'Nottinghamshire',
+    'Broxtowe': 'Nottinghamshire',
+    'Gedling': 'Nottinghamshire',
+    'Mansfield': 'Nottinghamshire',
+    'Newark and Sherwood': 'Nottinghamshire',
+    'Rushcliffe': 'Nottinghamshire',
+    'Herefordshire, County of': 'Herefordshire',
+    'Shropshire': 'Shropshire',
+    'Stoke-on-Trent': 'Staffordshire',
+    'Telford and Wrekin': 'Shropshire',
+    'Cannock Chase': 'Staffordshire',
+    'East Staffordshire': 'Staffordshire',
+    'Lichfield': 'Staffordshire',
+    'Newcastle-under-Lyme': 'Staffordshire',
+    'South Staffordshire': 'Staffordshire',
+    'Stafford': 'Staffordshire',
+    'Staffordshire Moorlands': 'Staffordshire',
+    'Tamworth': 'Staffordshire',
+    'North Warwickshire': 'Warwickshire',
+    'Nuneaton and Bedworth': 'Warwickshire',
+    'Rugby': 'Warwickshire',
+    'Stratford-on-Avon': 'Warwickshire',
+    'Warwick': 'Warwickshire',
+    'Birmingham': 'West Midlands',
+    'Coventry': 'West Midlands',
+    'Dudley': 'West Midlands',
+    'Sandwell': 'West Midlands',
+    'Solihull': 'West Midlands',
+    'Walsall': 'West Midlands',
+    'Wolverhampton': 'West Midlands',
+    'Bromsgrove': 'Worcestershire',
+    'Malvern Hills': 'Worcestershire',
+    'Redditch': 'Worcestershire',
+    'Worcester': 'Worcestershire',
+    'Wychavon': 'Worcestershire',
+    'Wyre Forest': 'Worcestershire',
     'Bedford': 'Bedfordshire',
     'Central Bedfordshire': 'Bedfordshire',
-    'West Berkshire': 'Berkshire',
-    'Cumberland': 'Cumbria',
-    
-    
-    # add more mappings as needed...
+    'Luton': 'Bedfordshire',
+    'Peterborough': 'Cambridgeshire',
+    'Southend-on-Sea': 'Essex',
+    'Thurrock': 'Essex',
 }
 
-## Put the cambirdge together
-## put together derbyshire 
-
-
-
 # Apply replacements
-summary['County'] = summary['County'].replace(replace_map)
+summary['County'] = summary['County'].replace(local_authority_to_county)
+
+
+# Function to calculate weighted average for poverty percentage
+def weighted_avg(group, value_col, weight_col):
+    total_weight = group[weight_col].sum()
+    if total_weight == 0:
+        return 0
+    return (group[value_col] * group[weight_col]).sum() / total_weight
+
+summary = df_children.groupby('County').apply(
+    lambda g: pd.Series({
+        'Total_children_2018': g['Number_ of_children_2018'].sum(),
+        'Total_children_2024': g['Number_ of_children_2024'].sum(),
+        'Weighted_percentage_2018': weighted_avg(g, 'Percentage_of_children_2018', 'Number_ of_children_2018'),
+        'Weighted_percentage_2024': weighted_avg(g, 'Percentage_of_children_2024', 'Number_ of_children_2024'),
+    })
+).reset_index()
+
+print(summary)
+
+
 
 # Now merge
 merged_GCSE_poverty_2018_2024 = df_merged_2018_vs_2024.merge(summary, on='County', how='inner')
@@ -175,96 +313,107 @@ summary_stats.to_csv('data/summary_stats_2018_vs_2024.csv', index=False)
 
 
 ### 
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# Set the style for a clean plot
-sns.set(style="whitegrid")
-
-# Create the scatter plot
-plt.figure(figsize=(10, 6))
-plt.figure(figsize=(10, 6))
-sns.scatterplot(
-    data=merged_GCSE_poverty_2018_2024,
-    x='Weighted_percentage_2024',
-    y='Change_from_National_Difference_of_passing_2024_vs_2024',
-    hue='National_Diff_Change_Direction',  # <- your column uses 'UP', 'DOWN', 'NO CHANGE'
-    palette={
-        'UP': 'green',
-        'DOWN': 'red',
-        'NO CHANGE': 'gray'
-    }
-)
-
-plt.title('2024 Child Poverty vs Change in Pass Rate Relative to National Average')
-plt.xlabel('Child Poverty Percentage (2024)')
-plt.ylabel('Change from National Average (2024 vs 2018)')
-
-plt.legend(title='Pass Rate Change vs National Avg')
-plt.grid(True)
-plt.tight_layout()
-plt.show()
-# Save the plot
-plt.savefig('data/2024_Child_Poverty_vs_Change_in_Pass_Rate.png', dpi=300)
-
-
-## Change in direcion and change of poverty in relation to inital poverty ## 2018
+from adjustText import adjust_text
 
 plt.figure(figsize=(10, 6))
 scatter = sns.scatterplot(
     data=merged_GCSE_poverty_2018_2024,
     x='Change_in_Poverty_2024_2018',
     y='Change_from_National_Difference_of_passing_2024_vs_2024',
-    size='Total_children_2024',  # optional, gives you the sense of population
-    hue='Weighted_percentage_2018',  # starting poverty
-    palette='coolwarm',  # or try 'viridis'
+    size='Total_children_2024',
+    hue='Weighted_percentage_2018',
+    palette='coolwarm',
     sizes=(20, 200),
     alpha=0.7
 )
 
-plt.title('Change in Poverty vs. Change in GCSE Pass Rate Gap\n(Color = Initial Poverty in 2018)')
-plt.xlabel('Change in Child Poverty (2024 vs 2018)')
-plt.ylabel('Change in GCSE Pass Rate Gap vs National (2024 vs 2018)')
+# Create label objects
+texts = []
+for i, row in merged_GCSE_poverty_2018_2024.iterrows():
+    texts.append(
+        plt.text(
+            row['Change_in_Poverty_2024_2018'],
+            row['Change_from_National_Difference_of_passing_2024_vs_2024'],
+            row['County'],
+            fontsize=8
+        )
+    )
 
-plt.axhline(0, color='black', linestyle='--', linewidth=0.7)  # no change in pass rate
-plt.axvline(0, color='black', linestyle='--', linewidth=0.7)  # no change in poverty
+# Adjust labels with a minimum distance from points to avoid overlap with bubbles
+adjust_text(
+    texts,
+    arrowprops=dict(arrowstyle='-', color='gray', alpha=0.5),
+    force_text=0.2,        # Allow text to move further from points
+    force_points=0.4,      # Allow points to move slightly to make space
+    only_move={'points': 'y', 'text': 'xy'},  # Move the labels freely in both directions
+    lim=100,               # Increase iterations to improve placement
+    add_textprops={'verticalalignment': 'bottom', 'horizontalalignment': 'left'},  # Adjust label alignment
+    expand_points=(1.5, 1.5),  # Expand the area in which points can move, giving them more space
+)
+
+plt.title('Change in Poverty vs. Change in Pass Rate Gap\n(Labels Adjusted for Clarity)')
+plt.xlabel('Change in Child Poverty (2024 vs 2018)')
+plt.ylabel('Change in Pass Rate Gap to National Average (2024 vs 2018)')
+plt.axhline(0, color='black', linestyle='--', linewidth=0.7)
+plt.axvline(0, color='black', linestyle='--', linewidth=0.7)
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+plt.savefig('data/2024_Child_Poverty_vs_Change_in_Pass_Rate.png', dpi=300)
+
+
+## Change in direcion and change of poverty in relation to inital poverty ## 2018
+
+from adjustText import adjust_text
+
+plt.figure(figsize=(10, 6))
+scatter = sns.scatterplot(
+    data=merged_GCSE_poverty_2018_2024,
+    x='Change_in_Poverty_2024_2018',
+    y='Change_from_National_Difference_of_passing_2024_vs_2024',
+    size='Total_children_2024',
+    hue='Weighted_percentage_2018',
+    palette='coolwarm',
+    sizes=(20, 200),
+    alpha=0.7
+)
+
+# Create label objects for each county
+texts = []
+for i, row in merged_GCSE_poverty_2018_2024.iterrows():
+    texts.append(
+        plt.text(
+            row['Change_in_Poverty_2024_2018'],
+            row['Change_from_National_Difference_of_passing_2024_vs_2024'],
+            row['County'],
+            fontsize=8
+        )
+    )
+
+# Adjust labels with a minimum distance from points to avoid overlap with bubbles
+adjust_text(
+    texts,
+    arrowprops=dict(arrowstyle='-', color='gray', alpha=0.5),
+    force_text=0.2,        # Allow text to move further from points
+    force_points=0.4,      # Allow points to move slightly to make space
+    only_move={'points': 'y', 'text': 'xy'},  # Move the labels freely in both directions
+    lim=100,               # Increase iterations to improve placement
+    add_textprops={'verticalalignment': 'bottom', 'horizontalalignment': 'left'},  # Adjust label alignment
+    expand_points=(1.5, 1.5),  # Expand the area in which points can move, giving them more space
+)
+
+plt.title('Change in Poverty vs. Change in Pass Rate Gap\n(Labels Adjusted for Clarity)')
+plt.xlabel('Change in Child Poverty (2024 vs 2018)')
+plt.ylabel('Change in Pass Rate Gap vs National (2024 vs 2018)')
+
+plt.axhline(0, color='black', linestyle='--', linewidth=0.7)  # reference line for pass rate
+plt.axvline(0, color='black', linestyle='--', linewidth=0.7)  # reference line for poverty
 
 plt.grid(True)
 plt.tight_layout()
 plt.show()
+
 # Save the plot
 plt.savefig('data/Change_in_Poverty_vs_Change_in_Pass_Rate.png', dpi=300)
 
-
-sns.lmplot(
-    data=merged_GCSE_poverty_2018_2024,
-    x='Change_in_Poverty_2024_2018',
-    y='Change_from_National_Difference_of_passing_2024_vs_2024',
-    hue='Poverty_Change_Direction',  # or bin the starting poverty into high/low
-    scatter_kws={'alpha':0.6},
-    height=6,
-    aspect=1.2
-)
-plt.axhline(0, color='black', linestyle='--', linewidth=0.7)
-plt.axvline(0, color='black', linestyle='--', linewidth=0.7)
-plt.tight_layout()
-plt.show()
-# Save the plot
-plt.savefig('data/Change_in_Poverty_vs_Change_in_Pass_Rate_with_LM.png', dpi=300)
-
-
-### partial correlation 
-
-import pingouin as pg
-
-# Compute partial correlation: change in pass rate vs change in poverty, controlling for initial poverty
-partial_corr = pg.partial_corr(
-    data=merged_GCSE_poverty_2018_2024,
-    x='Change_in_Poverty_2024_2018',
-    y='Change_from_National_Difference_of_passing_2024_vs_2024',
-    covar='Weighted_percentage_2018',
-    method='pearson'
-)
-
-print(partial_corr)
